@@ -1,4 +1,4 @@
-import { COLORS } from "@/constants/ui";
+import { useTheme } from "@/contexts/ThemeContext";
 import { StyleSheet, TextInput, TextInputProps, View } from "react-native";
 
 type StyledTextInputProps = TextInputProps & {
@@ -10,11 +10,19 @@ const StyledTextInput: React.FC<StyledTextInputProps> = ({
   style,
   ...props
 }) => {
+  const { theme } = useTheme();
+  
   return (
-    <View style={[styles.wrapper, isError ? styles.errorWrapper : null]}>
+    <View style={[
+      styles.wrapper, 
+      {
+        backgroundColor: theme.colors.PRIMARY_BACKGROUND,
+        borderColor: isError ? theme.colors.ERROR_COLOR : theme.colors.PRIMARY_BORDER,
+      }
+    ]}>
       <TextInput
-        style={[styles.input, style]}
-        placeholderTextColor={COLORS.PLACEHOLDER}
+        style={[styles.input, { color: theme.colors.PRIMARY_TEXT }, style]}
+        placeholderTextColor={theme.colors.TEXT_SECONDARY}
         {...props}
       />
     </View>
@@ -23,21 +31,15 @@ const StyledTextInput: React.FC<StyledTextInputProps> = ({
 
 const styles = StyleSheet.create({
   wrapper: {
-    backgroundColor: COLORS.PRIMARY_BACKGROUND,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: COLORS.PRIMARY_BORDER,
     height: 48,
     paddingHorizontal: 16,
     justifyContent: "center",
   },
-  errorWrapper: {
-    borderColor: COLORS.PRIMARY_RED,
-  },
   input: {
-    color: COLORS.PRIMARY_TEXT,
     fontSize: 16,
-    padding: 0, // padding переносим в wrapper
+    padding: 0, 
   },
 });
 

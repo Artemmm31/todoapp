@@ -1,4 +1,4 @@
-import { COLORS } from "@/constants/ui";
+import { useTheme } from "@/contexts/ThemeContext";
 import {
     Modal,
     StyleSheet,
@@ -17,6 +17,8 @@ const StyledModal: React.FC<StyledModalProps> = ({
   onClose,
   children,
 }) => {
+  const { theme } = useTheme();
+  
   return (
     <Modal
       visible={isOpen}
@@ -27,7 +29,7 @@ const StyledModal: React.FC<StyledModalProps> = ({
       <TouchableWithoutFeedback onPress={onClose}>
         <View style={styles.modalBackgroundContiner}>
           <TouchableWithoutFeedback onPress={(e) => e.stopPropagation()}>
-            <View style={styles.contentContainer}>{children}</View>
+            <View style={[styles.contentContainer, { backgroundColor: theme.colors.PRIMARY_BACKGROUND }]}>{children}</View>
           </TouchableWithoutFeedback>
         </View>
       </TouchableWithoutFeedback>
@@ -46,7 +48,6 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 10,
     width: "90%",
-    backgroundColor: COLORS.PRIMARY_BACKGROUND,
   },
 });
 

@@ -1,4 +1,4 @@
-import { COLORS } from "@/constants/ui";
+import { useTheme } from "@/contexts/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 import {
     StyleSheet,
@@ -22,33 +22,51 @@ const StyledButton: React.FC<StyledButtonProps> = ({
   disabled,
   ...props
 }) => {
+  const { theme } = useTheme();
   const textVariant = (() => {
     if (size === 'large') return 'heading';
     return "small";
   })();
   return (
     <TouchableOpacity
-      style={[styles.base, 
+      style={[
+        styles.base,
+        {
+          backgroundColor: variant === "secondary" 
+            ? theme.colors.SECONDARY_BACKGROUND 
+            : variant === "delete"
+            ? theme.colors.ERROR_COLOR
+            : theme.colors.PRIMARY_ACTIVE_BUTTON,
+          borderColor: variant === "secondary" 
+            ? theme.colors.PRIMARY_ACTIVE_BUTTON 
+            : "transparent",
+        },
         disabled ? styles.disabled : null,
-        // Sizes
         size === "small" ? styles.small : null,
         size === "large" ? styles.large : null,
-        // Variants
-        variant === "secondary" ? styles.secondary : null,
-        variant === "delete" ? styles.delete : null
     ]}
       {...props}
       disabled={disabled}
     >
-      {label && <StyledText variant={textVariant}>{label}</StyledText>}
-      {icon && <Ionicons name={icon} size={14} color={COLORS.PRIMARY_TEXT} />}
+      {label && (
+        <StyledText 
+          variant={textVariant}
+          style={{ 
+            color: variant === "secondary" 
+              ? theme.colors.PRIMARY_ACTIVE_BUTTON 
+              : "#FFFFFF" 
+          }}
+        >
+          {label}
+        </StyledText>
+      )}
+      {icon && <Ionicons name={icon} size={14} color={variant === "secondary" ? theme.colors.PRIMARY_ACTIVE_BUTTON : "#FFFFFF"} />}
     </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
   base: {
-    backgroundColor: COLORS.PRIMARY_ACTIVE_BUTTON,
     justifyContent: "center",
     alignItems: "center",
     flexDirection: "row",
@@ -60,20 +78,11 @@ const styles = StyleSheet.create({
   disabled: {
     opacity: 0.5
   },
-  // Sizes
   small: {
     paddingHorizontal: 12,
   },
   large: {
     paddingHorizontal: 30,
-  },
-  // Variants
-  secondary: {
-    backgroundColor: COLORS.SECONDARY_BACKGROUND,
-    borderColor: COLORS.PRIMARY_ACTIVE_BUTTON,
-  },
-  delete: {
-    backgroundColor: COLORS.PRIMARY_RED,
   },
 });
 

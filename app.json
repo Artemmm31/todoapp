@@ -19,7 +19,12 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.aaaahshxjcjid.ToDo",
+      "permissions": [
+        "android.permission.INTERNET",
+        "android.permission.ACCESS_NETWORK_STATE"
+      ]
     },
     "web": {
       "output": "static",
@@ -38,11 +43,42 @@
             "backgroundColor": "#000000"
           }
         }
-      ]
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/icon.png",
+          "color": "#ffffff",
+          "defaultChannel": "default"
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "This app needs access to your location to add locations to your tasks.",
+          "locationAlwaysPermission": "This app needs access to your location to add locations to your tasks.",
+          "locationWhenInUsePermission": "This app needs access to your location to add locations to your tasks.",
+          "isIosBackgroundLocationEnabled": false
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "This app needs access to your photos to attach images to your tasks.",
+          "cameraPermission": "This app needs access to your camera to take photos for your tasks."
+        }
+      ],
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "463ddb7b-920f-40b9-b78d-e6cc298fdc25"
+      }
     }
   }
 }

@@ -1,4 +1,4 @@
-import { COLORS } from "@/constants/ui";
+import { useTheme } from "@/contexts/ThemeContext";
 import { StyleSheet, Text, TextProps } from "react-native";
 
 type StyledTextProps = TextProps & {
@@ -10,10 +10,12 @@ const StyledText: React.FC<StyledTextProps> = ({
   variant = "primary",
   ...props
 }) => {
+  const { theme } = useTheme();
+  
   return (
     <Text
       style={[
-        styles.base,
+        { color: theme.colors.PRIMARY_TEXT },
         variant === "title" ? styles.title : null,
         variant === "subTitle" ? styles.subTitle : null,
         variant === "heading" ? styles.heading : null,
@@ -26,9 +28,6 @@ const StyledText: React.FC<StyledTextProps> = ({
 };
 
 const styles = StyleSheet.create({
-  base: {
-    color: COLORS.PRIMARY_TEXT,
-  },
   title: {
     fontSize: 32,
     lineHeight: 36,

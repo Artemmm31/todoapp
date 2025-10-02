@@ -1,22 +1,25 @@
+import AttachmentPicker from "@/components/AttachmentPicker";
 import DatePicker from "@/components/DatePicker";
+import LocationPicker from "@/components/LocationPicker";
 import StyledButton from "@/components/StyledButton";
 import StyledTextInput from "@/components/StyledTextInput";
-import { COLORS } from "@/constants/ui";
-import { Todo } from "@/types/todo";
+import { useTheme } from "@/contexts/ThemeContext";
+import { Todo, TodoAttachment, TodoLocation } from "@/types/todo";
 import { BlurView } from "expo-blur";
 import { Calendar, FileText, MapPin, Type, X } from "lucide-react-native";
 import React, { useEffect, useState } from "react";
 import {
-  Animated,
-  Keyboard,
-  KeyboardAvoidingView,
-  Modal,
-  Platform,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  View,
+    Animated,
+    Keyboard,
+    KeyboardAvoidingView,
+    Modal,
+    Platform,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    TouchableWithoutFeedback,
+    View,
 } from "react-native";
 
 type TodoCreatorModalProps = {
@@ -32,10 +35,12 @@ const TodoCreatorModal: React.FC<TodoCreatorModalProps> = ({
 }) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [location, setLocation] = useState("");
+  const [location, setLocation] = useState<TodoLocation>({ address: '' });
+  const [attachments, setAttachments] = useState<TodoAttachment[]>([]);
   const [dueDate, setDueDate] = useState<Date | null>(null);
   const [inputError, setInputError] = useState(false);
   const [slideAnim] = useState(new Animated.Value(0));
+  const { theme } = useTheme();
 
   const onPressAdd = () => {
     if (!title.trim()) {
@@ -49,12 +54,14 @@ const TodoCreatorModal: React.FC<TodoCreatorModalProps> = ({
       title,
       description,
       location,
+      attachments,
       dueDate: dueDate ? dueDate.toISOString() : "",
     });
 
     setTitle("");
     setDescription("");
-    setLocation("");
+    setLocation({ address: '' });
+    setAttachments([]);
     setDueDate(null);
     setInputError(false);
     onClose();
@@ -85,12 +92,14 @@ const TodoCreatorModal: React.FC<TodoCreatorModalProps> = ({
         style={{ flex: 1, justifyContent: "flex-end" }}
       >
         <TouchableWithoutFeedback onPress={handleClose}>
-          <BlurView intensity={20} style={styles.overlay}>
+          <BlurView intensity={20} style={[styles.overlay, { backgroundColor: theme.mode === 'dark' ? 'rgba(0, 0, 0, 0.8)' : 'rgba(0, 0, 0, 0.7)' }]}>
             <TouchableWithoutFeedback onPress={() => {}}>
               <Animated.View
                 style={[
                   styles.modalContainer,
                   {
+                    backgroundColor: theme.colors.SECONDARY_BACKGROUND,
+                    borderTopColor: theme.colors.PRIMARY_BORDER,
                     transform: [
                       {
                         translateY: slideAnim.interpolate({
@@ -109,18 +118,18 @@ const TodoCreatorModal: React.FC<TodoCreatorModalProps> = ({
                   },
                 ]}
               >
-                <View style={styles.header}>
-                  <Text style={styles.headerTitle}>Create New Task</Text>
-                  <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
-                    <X size={24} color="#666" />
+                <View style={[styles.header, { borderBottomColor: theme.colors.PRIMARY_BORDER }]}>
+                  <Text style={[styles.headerTitle, { color: theme.colors.PRIMARY_TEXT }]}>Create New Task</Text>
+                  <TouchableOpacity onPress={handleClose} style={[styles.closeButton, { backgroundColor: theme.colors.PRIMARY_BACKGROUND }]}>
+                    <X size={24} color={theme.colors.TEXT_SECONDARY} />
                   </TouchableOpacity>
                 </View>
 
-                <View style={styles.content}>
+                <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
                   <View style={styles.fieldContainer}>
                     <View style={styles.fieldHeader}>
                       <Type size={18} color="#4F46E5" />
-                      <Text style={styles.fieldLabel}>Title</Text>
+                      <Text style={[styles.fieldLabel, { color: theme.colors.PRIMARY_TEXT }]}>Title</Text>
                     </View>
                     <StyledTextInput
                       placeholder="Enter task title..."
@@ -133,7 +142,7 @@ const TodoCreatorModal: React.FC<TodoCreatorModalProps> = ({
                   <View style={styles.fieldContainer}>
                     <View style={styles.fieldHeader}>
                       <FileText size={18} color="#059669" />
-                      <Text style={styles.fieldLabel}>Description</Text>
+                      <Text style={[styles.fieldLabel, { color: theme.colors.PRIMARY_TEXT }]}>Description</Text>
                     </View>
                     <StyledTextInput
                       placeholder="Add description..."
@@ -148,36 +157,49 @@ const TodoCreatorModal: React.FC<TodoCreatorModalProps> = ({
                   <View style={styles.fieldContainer}>
                     <View style={styles.fieldHeader}>
                       <MapPin size={18} color="#DC2626" />
-                      <Text style={styles.fieldLabel}>Location</Text>
+                      <Text style={[styles.fieldLabel, { color: theme.colors.PRIMARY_TEXT }]}>Location</Text>
                     </View>
-                    <StyledTextInput
-                      placeholder="Add location..."
-                      value={location}
-                      onChangeText={setLocation}
+                    <LocationPicker
+                      location={location}
+                      onLocationChange={setLocation}
                     />
                   </View>
 
                   <View style={styles.fieldContainer}>
                     <View style={styles.fieldHeader}>
                       <Calendar size={18} color="#7C3AED" />
-                      <Text style={styles.fieldLabel}>Due Date</Text>
+                      <Text style={[styles.fieldLabel, { color: theme.colors.PRIMARY_TEXT }]}>Due Date</Text>
                     </View>
                     <DatePicker date={dueDate} onChange={setDueDate}>
                       {(openPicker) => (
-                        <TouchableOpacity onPress={openPicker} style={styles.datePickerButton}>
-                          <Text style={styles.datePickerText}>
+                        <TouchableOpacity onPress={openPicker} style={[styles.datePickerButton, { backgroundColor: theme.colors.PRIMARY_BACKGROUND, borderColor: theme.colors.PRIMARY_BORDER }]}>
+                          <Text style={[styles.datePickerText, { color: theme.colors.PRIMARY_TEXT }]}>
                             {dueDate ? dueDate.toLocaleDateString() : "Select due date"}
                           </Text>
-                          <Calendar size={16} color="#666" />
+                          <Calendar size={16} color={theme.colors.TEXT_SECONDARY} />
                         </TouchableOpacity>
                       )}
                     </DatePicker>
                   </View>
-                </View>
 
-                <View style={styles.actions}>
-                  <TouchableOpacity onPress={handleClose} style={styles.cancelButton}>
-                    <Text style={styles.cancelButtonText}>Cancel</Text>
+                  <View style={styles.fieldContainer}>
+                    <View style={styles.fieldHeader}>
+                      <FileText size={18} color="#F59E0B" />
+                      <Text style={[styles.fieldLabel, { color: theme.colors.PRIMARY_TEXT }]}>Attachments</Text>
+                    </View>
+                    <AttachmentPicker
+                      attachments={attachments}
+                      onAddAttachment={(attachment) => setAttachments([...attachments, attachment])}
+                      onRemoveAttachment={(attachmentId) => 
+                        setAttachments(attachments.filter(a => a.id !== attachmentId))
+                      }
+                    />
+                  </View>
+                </ScrollView>
+
+                <View style={[styles.actions, { borderTopColor: theme.colors.PRIMARY_BORDER }]}>
+                  <TouchableOpacity onPress={handleClose} style={[styles.cancelButton, { backgroundColor: theme.colors.PRIMARY_BACKGROUND, borderColor: theme.colors.PRIMARY_BORDER }]}>
+                    <Text style={[styles.cancelButtonText, { color: theme.colors.TEXT_SECONDARY }]}>Cancel</Text>
                   </TouchableOpacity>
                   <StyledButton
                     label="Create Task"
@@ -198,16 +220,14 @@ const TodoCreatorModal: React.FC<TodoCreatorModalProps> = ({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.7)",
     justifyContent: "flex-end",
   },
 
   modalContainer: {
-    backgroundColor: COLORS.SECONDARY_BACKGROUND,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
-    minHeight: "70%",
-    maxHeight: "90%",
+    height: "85%",
+    maxHeight: "85%",
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -217,7 +237,7 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     elevation: 8,
     borderTopWidth: 1,
-    borderTopColor: COLORS.PRIMARY_BORDER,
+    display: 'flex',
   },
 
   header: {
@@ -227,22 +247,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 20,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.PRIMARY_BORDER,
   },
 
   headerTitle: {
     fontSize: 20,
     fontWeight: "700",
-    color: COLORS.PRIMARY_TEXT,
   },
 
   closeButton: {
     padding: 8,
     borderRadius: 12,
-    backgroundColor: COLORS.PRIMARY_BACKGROUND,
   },
 
   content: {
+    flex: 1,
     paddingHorizontal: 20,
     paddingTop: 24,
     paddingBottom: 8,
@@ -262,16 +280,13 @@ const styles = StyleSheet.create({
   fieldLabel: {
     fontSize: 14,
     fontWeight: "600",
-    color: COLORS.PRIMARY_TEXT,
   },
 
   datePickerButton: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: COLORS.PRIMARY_BACKGROUND,
     borderWidth: 1,
-    borderColor: COLORS.PRIMARY_BORDER,
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 12,
@@ -280,7 +295,6 @@ const styles = StyleSheet.create({
 
   datePickerText: {
     fontSize: 16,
-    color: COLORS.PRIMARY_TEXT,
   },
 
   actions: {
@@ -288,7 +302,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 20,
     borderTopWidth: 1,
-    borderTopColor: COLORS.PRIMARY_BORDER,
     gap: 12,
   },
 
@@ -298,15 +311,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingVertical: 16,
     borderRadius: 12,
-    backgroundColor: COLORS.PRIMARY_BACKGROUND,
     borderWidth: 1,
-    borderColor: COLORS.PRIMARY_BORDER,
   },
 
   cancelButtonText: {
     fontSize: 16,
     fontWeight: "600",
-    color: COLORS.TEXT_SECONDARY,
   },
 });
 

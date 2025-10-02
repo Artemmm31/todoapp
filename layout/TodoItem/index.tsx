@@ -1,7 +1,7 @@
 import StyledButton from "@/components/StyledButton";
 import StyledCheckbox from "@/components/StyledCheckBox";
 import StyledText from "@/components/StyledText";
-import { COLORS } from "@/constants/ui";
+import { useTheme } from "@/contexts/ThemeContext";
 import { Todo } from "@/types/todo";
 import { useState } from "react";
 import { StyleSheet, TouchableOpacity, Vibration, View } from "react-native";
@@ -19,12 +19,15 @@ const TodoItem: React.FC<TodoItemProps> = ({
   description,
   dueDate,
   location,
+  attachments,
   isCompleted,
+  createdAt,
   onCheck,
   onDelete,
 }) => {
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const { theme } = useTheme();
 
   const onPressCheck = () => onCheck(id);
   const onConfirmDelete = () => {
@@ -41,7 +44,7 @@ const TodoItem: React.FC<TodoItemProps> = ({
 
   return (
     <>
-      <View style={styles.container}>
+      <View style={[styles.container, { backgroundColor: theme.colors.SECONDARY_BACKGROUND }]}>
         <StyledCheckbox checked={isCompleted} onCheck={onPressCheck} />
         <TouchableOpacity style={styles.textContainer} onPress={() => setIsDetailsModalOpen(true)}>
           <StyledText style={[styles.title, isCompleted && styles.completed]} numberOfLines={1}>
@@ -63,7 +66,7 @@ const TodoItem: React.FC<TodoItemProps> = ({
       <TodoDetailsModal
         isOpen={isDetailsModalOpen}
         onClose={() => setIsDetailsModalOpen(false)}
-        todo={{ id, title, description, dueDate, location, isCompleted }}
+        todo={{ id, title, description, dueDate, location, attachments, isCompleted, createdAt }}
       />
       <DeleteTodoModal
         isOpen={isDeleteModalOpen}
@@ -81,7 +84,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     padding: 15,
     marginVertical: 8,
-    backgroundColor: COLORS.SECONDARY_BACKGROUND,
   },
   textContainer: {
     flex: 1,
@@ -89,15 +91,12 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 16,
-    color: COLORS.PRIMARY_TEXT,
   },
   completed: {
     textDecorationLine: "line-through",
-    color: COLORS.TEXT_SECONDARY,
   },
   date: {
     fontSize: 12,
-    color: COLORS.TEXT_SECONDARY,
   },
   controlsContainer: {
     flexDirection: "row",

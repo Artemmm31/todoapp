@@ -14,12 +14,10 @@ const DatePicker: React.FC<DatePickerProps> = ({ date, onChange, children }) => 
   const openPicker = () => {
     if (Platform.OS === "android") {
       const currentDate = date || new Date();
-      // Android: сначала дата
       DateTimePickerAndroid.open({
         value: currentDate,
         onChange: (event, selectedDate) => {
           if (event.type === "set" && selectedDate) {
-            // затем время
             DateTimePickerAndroid.open({
               value: selectedDate,
               onChange: (_timeEvent, selectedTime) => {
